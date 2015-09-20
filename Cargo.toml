@@ -1,0 +1,10 @@
+[package]
+name = "playnow_crawler"
+version = "0.1.0"
+authors = ["XMPPwocky <nttheis@gmail.com>"]
+
+[dependencies]
+hyper = "0.6.13"
+
+[dependencies.redis]
+git = "https://github.com/mitsuhiko/redis-rs.git"
