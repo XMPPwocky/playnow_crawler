@@ -8,3 +8,6 @@ hyper = "0.6.13"
 
 [dependencies.redis]
 git = "https://github.com/mitsuhiko/redis-rs.git"
+serde = "*"
+serde_json = "*"
+serde_macros = "*"
