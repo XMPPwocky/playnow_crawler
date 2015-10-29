@@ -1,5 +1,5 @@
 [package]
-name = "playnow_crawler"
+name = "playnow_daemon"
 version = "0.1.0"
 authors = ["XMPPwocky <nttheis@gmail.com>"]
 
