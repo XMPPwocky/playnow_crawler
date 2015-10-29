@@ -7,12 +7,6 @@ use hyper;
 
 /// Somewhat expensive. Cache this.
 /// May panic.
-fn get_apikey() -> String {
-	match env::var("STEAM_APIKEY") {
-		Ok(key) => key,
-		Err(_) => panic!("No Steam API key found. Set the STEAM_APIKEY environment variable.")
-    }
-}
 
 #[derive(Debug)]
 pub enum Error {
