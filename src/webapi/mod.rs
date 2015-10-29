@@ -2,6 +2,7 @@ use serde_json;
 use std;
 use std::env;
 use std::io::prelude::*;
+use std::net;
 use hyper;
 
 /// Somewhat expensive. Cache this.
@@ -13,10 +14,12 @@ fn get_apikey() -> String {
     }
 }
 
+#[derive(Debug)]
 pub enum Error {
     HttpError(hyper::error::Error),
-    BadBody(serde_json::Error),
-    Io(std::io::Error)
+    Io(std::io::Error),
+    BadBody,
+    SteamError(u32) // EResult
 }
 impl std::convert::From<hyper::error::Error> for Error {
     fn from(e: hyper::error::Error) -> Error {
@@ -24,8 +27,8 @@ impl std::convert::From<hyper::error::Error> for Error {
     }
 }
 impl std::convert::From<serde_json::Error> for Error {
-    fn from(e: serde_json::Error) -> Error {
-        Error::BadBody(e)
+    fn from(_: serde_json::Error) -> Error {
+        Error::BadBody
     }
 }
 impl std::convert::From<std::io::Error> for Error {
@@ -68,8 +71,24 @@ impl ApiClient {
             try!(response.read_to_string(&mut body));
             body
         };
-        // why doesn't try! work?
-        serde_json::from_str(&body).map_err(std::convert::Into::into)
+
+        Ok(try!(serde_json::from_str::<serde_json::Value>(&body)))
+    }
+    pub fn get_player_server(&self, steamid: u64) -> Result<Option<String>, Error> {
+        let json = try!(self.get_player_summaries(&[steamid]));
+        let player = json.as_object().and_then(|o| o.get("response"))
+            .and_then(|response| response.as_object())
+            .and_then(|o| o.get("players"))
+            .and_then(|players| players.as_array())
+            .and_then(|a| a.get(0))
+            .and_then(|player| player.as_object());
+
+        if let Some(player) = player {
+            if player.get("gameid").and_then(|gameid| gameid.as_string()) == Some("440") {
+                return Ok(player.get("gameserverip").and_then(|ip| ip.as_string()).map(|x| x.to_owned()))
+            }
+        }
+
+        return Ok(None)
     }
 }
-

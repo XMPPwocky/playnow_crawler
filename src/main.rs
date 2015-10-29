@@ -8,4 +8,7 @@ mod serverqueries;
 
 fn main() {
     println!("Hello, world!");
+    let mut c = webapi::ApiClient::new();
+    println!("{:?}", c.get_player_summaries(&[76561197970498549]).unwrap());
+    println!("{:?}", c.get_player_server(76561197970498549).unwrap());
 }
