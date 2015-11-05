@@ -11,6 +11,7 @@ steamwebapi = "~0.4.0"
 steamid = "0.1.0"
 websocket = "~0.13.1"
 quick-error = "~0.1.4"
+postgres = "~0.10"
 
 [dependencies.redis]
 git = "https://github.com/mitsuhiko/redis-rs.git"

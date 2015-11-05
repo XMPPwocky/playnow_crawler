@@ -7,6 +7,7 @@ extern crate websocket;
 extern crate steamid;
 #[macro_use]
 extern crate quick_error;
+extern crate postgres;
 
 use std::thread;
 
@@ -14,6 +15,10 @@ mod backend;
 mod wshandler;
 
 type QueueStatus = ();
+enum GameServer {
+    SteamId(steamid::SteamId),
+    IpPort((std::net::Ipv4Addr, u16))
+}
 
 fn get_apikey() -> String {
     match std::env::var("STEAM_APIKEY") {
