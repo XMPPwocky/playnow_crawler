@@ -4,7 +4,7 @@ use redis;
 use redis::Commands;
 use postgres;
 use QueueStatus;
-use GameServer;
+use GameServerId;
 
 quick_error! {
     #[derive(Debug)]
@@ -32,7 +32,7 @@ impl Backend {
         let redis_client = redis::Client::open("redis://127.0.0.1/").unwrap();
         let redis = redis_client.get_connection().unwrap();
         let postgres = postgres::Connection::connect(
-            ::get_postgres_url(),
+            &::get_postgres_url() as &str,
             &postgres::SslMode::None
             ).unwrap();
 
@@ -58,7 +58,9 @@ impl Backend {
 
     pub fn start_playing(&mut self, steamid: SteamId) -> BackendResult<()> {
         // okay, what are my favorite servers?
-        let mut preferred_servers = try!(self.get_preferred_servers);
+        let preferred_servers = try!(
+            self.get_player_preferred_servers(steamid)
+            );
         // search servers, maybe put in favorite server and return
         // now check all these servers. first, query Redis...
         // if not found, query the server directly, put in Redis,
@@ -72,7 +74,7 @@ impl Backend {
     }
 
     pub fn get_player_preferred_servers(&mut self, steamid: SteamId)
-        -> BackendResult<Vec<GameServer>> {
+        -> BackendResult<Vec<GameServerId>> {
             unimplemented!()
         }
 
