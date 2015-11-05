@@ -32,13 +32,13 @@ enum GameServerId {
 fn get_apikey() -> String {
     match std::env::var("STEAM_APIKEY") {
         Ok(key) => key,
-        Err(_) => panic!("No Steam API key found. Set the STEAM_APIKEY environment variable.")
+        _ => panic!("No Steam API key found. Set the STEAM_APIKEY environment variable.")
     }
 }
 fn get_postgres_url() -> String {
     match std::env::var("POSTGRES_URL") {
         Ok(key) => key,
-        Err(_) => panic!("No Postgres URI found. Set the POSTGRES_URL environment variable.")
+        _ => panic!("No Postgres URI found. Set the POSTGRES_URL environment variable.")
     }
 }
 
