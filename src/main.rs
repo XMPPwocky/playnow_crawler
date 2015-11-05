@@ -15,7 +15,15 @@ use std::thread;
 mod backend;
 mod wshandler;
 
-type QueueStatus = ();
+#[derive(Clone, PartialEq, Eq, Debug)]
+enum QueueStatus {
+    NotQueuing,
+    Queuing,
+    MatchFound(u64),
+    MatchConfirmed(GameServerId)
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
 enum GameServerId {
     SteamId(steamid::SteamId),
     IpPort((std::net::Ipv4Addr, u16))
