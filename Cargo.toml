@@ -7,8 +7,10 @@ authors = ["XMPPwocky <nttheis@gmail.com>"]
 hyper = "0.6.13"
 serde = "*"
 serde_json = "*"
-steamwebapi = "*"
+steamwebapi = "~0.4.0"
+steamid = "0.1.0"
 websocket = "~0.13.1"
+quick-error = "~0.1.4"
 
 [dependencies.redis]
 git = "https://github.com/mitsuhiko/redis-rs.git"

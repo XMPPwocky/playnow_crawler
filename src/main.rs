@@ -4,12 +4,18 @@ extern crate steamwebapi;
 extern crate hyper;
 extern crate redis;
 extern crate websocket;
+extern crate steamid;
+#[macro_use]
+extern crate quick_error;
 
 use std::thread;
 use websocket::{Server, Message, Sender, Receiver};
 use websocket::message::Type;
+use steamid::SteamId;
 
-mod serverqueries;
+mod backend;
+
+type QueueStatus = ();
 
 fn get_apikey() -> String {
     match std::env::var("STEAM_APIKEY") {
@@ -17,6 +23,7 @@ fn get_apikey() -> String {
         Err(_) => panic!("No Steam API key found. Set the STEAM_APIKEY environment variable.")
     }
 }
+
 fn main() {
     let steam_apikey = get_apikey();
     let mut ws_server = Server::bind("127.0.0.1:2794").unwrap();
@@ -41,14 +48,13 @@ websocket::stream::WebSocketStream>;
 fn handler(mut connection: WebSocketConnection, steam_apikey: String) {
     use websocket::server::request::RequestUri;
     use redis::Commands;
-    use std::str::FromStr;
 
     println!("connect");
 
     let webapi = steamwebapi::ApiClient::new(steam_apikey);
     let redis_cli = redis::Client::open("redis://127.0.0.1/").unwrap();
     let redis_con = redis_cli.get_connection();
-    // FIXME: unwraps probably DoS
+    // FIXME: unwraps
 
     let request = connection.read_request().unwrap();
     request.validate().unwrap();
@@ -58,21 +64,18 @@ fn handler(mut connection: WebSocketConnection, steam_apikey: String) {
     let sessionid = match request.url {
         RequestUri::AbsolutePath(ref path) => {
             if path.len() > 1 {
-                Some(u64::from_str(&path[1..]))
+                Some(path[1..].to_owned())
             } else {
                 None
             }
         },
         _ => None
-    }.and_then(|sessionid| sessionid.ok()); 
-    println!("{:?}", sessionid);
+    };
 
     let steamid = match sessionid.map(|sessionid| {
-        let sessionid = format!("session:{:?}", sessionid);
-        println!("{:?}", sessionid);
-        let x = redis_cli.get(sessionid);
-        println!("{:?}", x);
-        x.ok()
+        let sessionid = format!("session_steamid:{}", sessionid);
+        let steamid64 = redis_cli.get(sessionid);
+        steamid64.ok().map(SteamId::from_u64)
     }) {
         Some(Some(steamid)) => steamid,
         _ => {
@@ -83,8 +86,6 @@ fn handler(mut connection: WebSocketConnection, steam_apikey: String) {
 
     let response = request.accept();
     let mut client = response.send().unwrap();
-
-    // check in with redis here. check session, get SteamID...
 
     let (mut sender, mut receiver) = client.split();
 
