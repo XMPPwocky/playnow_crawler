@@ -14,6 +14,11 @@ quick_error! {
             cause(err)
             description(err.description())
         }
+        Postgres(err: postgres::error::DbError) {
+            from()
+            cause(err)
+            description(err.description())
+        }
     }
 }
 pub type BackendResult<T> = Result<T, BackendError>;
