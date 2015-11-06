@@ -23,11 +23,8 @@ enum QueueStatus {
     MatchConfirmed(GameServerId)
 }
 
-#[derive(Clone, PartialEq, Eq, Debug)]
-enum GameServerId {
-    SteamId(steamid::SteamId),
-    IpPort((std::net::Ipv4Addr, u16))
-}
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+struct GameServerId(u32);
 
 fn get_apikey() -> String {
     match std::env::var("STEAM_APIKEY") {

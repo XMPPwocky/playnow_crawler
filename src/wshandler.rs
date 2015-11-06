@@ -3,6 +3,7 @@ use websocket;
 use websocket::{Message, Sender, Receiver};
 use websocket::message::Type;
 use steamid::SteamId;
+use std;
 
 pub type WebSocketConnection = websocket::server::Connection<
 websocket::stream::WebSocketStream,
@@ -60,8 +61,18 @@ fn handler_mainloop(mut backend: backend::Backend, client: WebSocketClient, stea
                     sender.send_message(&message).unwrap();
                 }
                 Type::Text => {
-                    let message = Message::text(format!("{:?}", backend.get_queue_status(steamid)));
-                    sender.send_message(&message).unwrap();
+                    let payload_str = std::str::from_utf8(&message.payload);
+                    if let Ok(payload_str) = payload_str {
+                        let message = Message::text(
+                            if payload_str == "start_playing" {
+                                format!("{:?}", backend.start_playing(steamid))
+                            } else {
+                                format!("{:?}", backend.get_queue_status(steamid))
+                            }
+                            );
+
+                        sender.send_message(&message).unwrap();
+                    }
                 }
                 _ => sender.send_message(&message).unwrap(),
             }

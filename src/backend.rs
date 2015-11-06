@@ -64,6 +64,7 @@ impl Backend {
         let preferred_servers = try!(
             self.get_player_preferred_servers(steamid)
             );
+
         // search servers, maybe put in favorite server and return
         // now check all these servers. first, query Redis...
 
@@ -73,15 +74,25 @@ impl Backend {
         // now, of those servers... are any OK?
         // if so... put them in there
         // if not... put in fallback server. then, put in queue...
+        
+        try!(self.put_player_in_queue(steamid, preferred_servers[0]));
 
         // maybe put in fallback server and queue for favorites
-        unimplemented!()
+        //unimplemented!()
+        Ok(())
+    }
+
+    pub fn put_player_in_queue(&mut self, steamid: SteamId, server: GameServerId) -> BackendResult<()> {
+        try!(self.redis.sadd(format!("server_queuers:{}", server.0), steamid));
+        try!(self.redis.set(format!("player_queue_info:{}", steamid.to_u64()), ""));
+
+        Ok(())
     }
 
     pub fn get_player_preferred_servers(&mut self, steamid: SteamId)
         -> BackendResult<Vec<GameServerId>> {
             Ok(vec![
-               GameServerId::SteamId(SteamId::from_u64(1))
+               GameServerId(42)
                ])
         }
 
