@@ -51,14 +51,12 @@ impl Backend {
     pub fn auth_request(&mut self, sessionid: &str) -> BackendResult<Option<SteamId>> { 
         // FIXME: delete the sessionid too.
 
-        let result: Option<u64> = try!(self.redis.get(format!("session_steamid:{}", sessionid)));
+        let steamid: Option<SteamId> = try!(self.redis.get(format!("session_steamid:{}", sessionid)));
 
-        let steamid = result.map(SteamId::from_u64);
-        
         debug_assert_eq!(steamid.and_then(SteamId::get_universe), Some(::steamid::Universe::Public));
         debug_assert_eq!(steamid.and_then(SteamId::get_type), Some(::steamid::AccountType::Individual));
 
-        Ok(result.map(SteamId::from_u64))
+        Ok(steamid)
     }
 
     pub fn start_playing(&mut self, steamid: SteamId) -> BackendResult<()> {
@@ -68,24 +66,37 @@ impl Backend {
             );
         // search servers, maybe put in favorite server and return
         // now check all these servers. first, query Redis...
+
         // if not found, query the server directly, put in Redis,
         // use a reasonable TTL.
+
         // now, of those servers... are any OK?
         // if so... put them in there
         // if not... put in fallback server. then, put in queue...
-        //
+
         // maybe put in fallback server and queue for favorites
         unimplemented!()
     }
 
     pub fn get_player_preferred_servers(&mut self, steamid: SteamId)
         -> BackendResult<Vec<GameServerId>> {
-            unimplemented!()
+            Ok(vec![
+               GameServerId::SteamId(SteamId::from_u64(1))
+               ])
         }
 
 
     pub fn get_queue_status(&mut self, steamid: SteamId) -> BackendResult<QueueStatus> {
-        unimplemented!()
+        let result: Option<()> = try!(self.redis.get(format!("player_queue_info:{}", steamid.to_u64())));
+
+        Ok(match result {
+            Some(()) => {
+                QueueStatus::Queuing
+            },
+            None => {
+                QueueStatus::NotQueuing
+            }
+        })
     }
 
     pub fn leave_queue(&mut self, steamid: SteamId) -> BackendResult<()> {

@@ -5,10 +5,10 @@ dependencies = [
  "hyper 0.6.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "postgres 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "quick-error 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "redis 0.5.1 (git+https://github.com/mitsuhiko/redis-rs.git)",
+ "redis 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "steamid 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "steamid 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "steamwebapi 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "websocket 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -275,7 +275,7 @@ dependencies = [
 [[package]]
 name = "redis"
 version = "0.5.1"
-source = "git+https://github.com/mitsuhiko/redis-rs.git#4a9b0053ff3bacceba9f5055a1d52311684981b7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "rustc-serialize 0.3.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "sha1 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -325,6 +325,14 @@ dependencies = [
 name = "steamid"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "steamid"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "redis 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "steamwebapi"
